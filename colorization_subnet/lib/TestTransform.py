@@ -19,7 +19,7 @@ import warnings
 
 from skimage import color
 
-import functional as F
+import colorization_subnet.lib.functional as F
 
 
 __all__ = ["Compose", "Concatenate", "ToTensor", "Normalize", "Resize", "CenterCrop",
