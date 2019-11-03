@@ -19,7 +19,7 @@ import warnings
 
 from skimage import color
 
-from functional import *
+import lib.functional as F
 
 
 __all__ = ["Compose", "Concatenate", "ToTensor", "Normalize", "Resize", "CenterCrop",
@@ -112,7 +112,7 @@ class ToTensor(object):
         Returns:
             Tensor: Converted image.
         """
-        inputs = CustomFunc(inputs, to_mytensor)
+        inputs = CustomFunc(inputs, F.to_mytensor)
         return inputs
 
 
@@ -136,15 +136,15 @@ class Normalize(object):
             Tensor: Normalized Tensor image.
         """
 
-        im_l  = normalize(inputs[0], 50, 1)  # [0, 100]
-        im_ab = normalize(inputs[1], (0, 0), (1, 1))  # [-100, 100]
+        im_l  = F.normalize(inputs[0], 50, 1)  # [0, 100]
+        im_ab = F.normalize(inputs[1], (0, 0), (1, 1))  # [-100, 100]
 
-        inputs[2][0:1, :, :] = normalize(inputs[2][0:1, :, :], 50, 1)
-        inputs[2][1:3, :, :] = normalize(inputs[2][1:3, :, :], (0, 0), (1, 1))
+        inputs[2][0:1, :, :] = F.normalize(inputs[2][0:1, :, :], 50, 1)
+        inputs[2][1:3, :, :] = F.normalize(inputs[2][1:3, :, :], (0, 0), (1, 1))
         warp_ba = inputs[2]
 
-        inputs[3][0:1, :, :] = normalize(inputs[3][0:1, :, :], 50, 1)
-        inputs[3][1:3, :, :] = normalize(inputs[3][1:3, :, :], (0, 0), (1, 1))
+        inputs[3][0:1, :, :] = F.normalize(inputs[3][0:1, :, :], 50, 1)
+        inputs[3][1:3, :, :] = F.normalize(inputs[3][1:3, :, :], (0, 0), (1, 1))
         warp_aba = inputs[3]
 
         # im_gbl_ab = F.normalize(inputs[4], (0, 0), (1, 1))  # [-100, 100]
@@ -156,8 +156,8 @@ class Normalize(object):
 
         for l in range(5):
             layer = inputs[4 + l]
-            err_ba = normalize(layer[0], 127, 2) #[0, 255]
-            err_ab = normalize(layer[1], 127, 2) #[0, 255]
+            err_ba = F.normalize(layer[0], 127, 2) #[0, 255]
+            err_ab = F.normalize(layer[1], 127, 2) #[0, 255]
             layer_data.append([err_ba, err_ab])
 
         return layer_data
@@ -189,7 +189,7 @@ class Resize(object):
         Returns:
             PIL Image: Rescaled image.
         """
-        return CustomFunc(inputs, resize, self.size, self.interpolation)
+        return CustomFunc(inputs, F.resize, self.size, self.interpolation)
 
 
 class RandomCrop(object):
@@ -241,10 +241,10 @@ class RandomCrop(object):
             PIL Image: Cropped image.
         """
         if self.padding > 0:
-            inputs = CustomFunc(inputs, pad, self.padding)
+            inputs = CustomFunc(inputs, F.pad, self.padding)
 
         i, j, h, w = self.get_params(inputs[0], self.size)
-        return CustomFunc(inputs, crop, i, j, h, w)
+        return CustomFunc(inputs, F.crop, i, j, h, w)
 
 
 class CenterCrop(object):
@@ -296,10 +296,10 @@ class CenterCrop(object):
             PIL Image: Cropped image.
         """
         if self.padding > 0:
-            inputs = CustomFunc(inputs, pad, self.padding)
+            inputs = CustomFunc(inputs, F.pad, self.padding)
 
         i, j, h, w = self.get_params(inputs[0], self.size)
-        return CustomFunc(inputs, crop, i, j, h, w)
+        return CustomFunc(inputs, F.crop, i, j, h, w)
 
 
 class RandomHorizontalFlip(object):
@@ -315,7 +315,7 @@ class RandomHorizontalFlip(object):
         """
 
         if random.random() < 0.5:
-            return CustomFunc(inputs, hflip)
+            return CustomFunc(inputs, F.hflip)
         return inputs
 
 
